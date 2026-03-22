@@ -15,7 +15,9 @@
 
 #include "iggy_audio_shim.h"
 
-_Static_assert(sizeof(pthread_t) == 8, "pthread_t must be 8 bytes");
+#ifndef __arm__
+    _Static_assert(sizeof(pthread_t) == 8, "pthread_t must be 8 bytes");
+#endif
 _Static_assert(sizeof(int) == 4, "int must be 32 bit");
 _Static_assert(sizeof(unsigned) == 4, "unsigned must be 32 bit");
 

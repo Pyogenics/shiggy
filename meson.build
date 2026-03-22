@@ -10,10 +10,6 @@ ar = find_program('ar')
 cc = meson.get_compiler('c')
 
 iggy_object_files = [
-    'ORBIS_rrAtomics.obj',
-    'ORBIS_rrCpu.obj',
-    'ORBIS_rrThreads.obj',
-    'ORBIS_rrTime.obj',
     'as3_component_helpers.obj',
     'as3vm.obj',
     'as3vm_abc_decode.obj',
@@ -52,7 +48,6 @@ iggy_object_files = [
     'iggy_platform_deps.obj',
     'iggy_sound.obj',
     'iggy_unicode.obj',
-    'radss_orbis.obj',
     'rrCore.obj',
     'rrMath.obj',
     'rrMem.obj',
@@ -87,6 +82,25 @@ iggy_object_files = [
     'triangulate_ears.obj',
     'zlib.obj',
 ]
+if host_machine.cpu_family() == 'arm'
+    iggy_lib_name = 'libiggy_psp2.a'
+    iggy_object_files += [
+        'psp2_rrAtomics.obj',
+        'psp2_rrCpu.obj',
+        'psp2_rrThreads.obj',
+        'psp2_rrTime.obj',
+        'radss_psp2.obj'
+    ]
+else
+    iggy_lib_name = 'libiggy_orbis.a'
+    iggy_object_files += [
+        'ORBIS_rrAtomics.obj',
+        'ORBIS_rrCpu.obj',
+        'ORBIS_rrThreads.obj',
+        'ORBIS_rrTime.obj',
+        'radss_orbis.obj'
+    ]
+endif
 
 patched_object_files = []
 foreach file : iggy_object_files
@@ -95,7 +109,7 @@ endforeach
 
 unpacked_objects = custom_target(
     'unpack-archive',
-    input: meson.project_source_root() / 'libs' / 'libiggy_orbis.a',
+    input: meson.project_source_root() / 'libs' / iggy_lib_name,
     output: iggy_object_files,
     command: [
         ar,
