@@ -14,6 +14,7 @@
 #include <fenv.h>
 
 #include "iggy_audio_shim.h"
+#include "iggy_sce_shim.h"
 
 #ifndef __arm__
     _Static_assert(sizeof(pthread_t) == 8, "pthread_t must be 8 bytes");
@@ -25,6 +26,7 @@ _Static_assert(sizeof(unsigned) == 4, "unsigned must be 32 bit");
 // MARK: CRT & Math Shims
 
 double _Sin(double x) { return sin(x); }
+double _Sinx(double x) { return sin(x); } //PSP2
 double _Log(double x) { return log(x); }
 
 // Map to the C fenv.h rounding modes
@@ -80,6 +82,24 @@ static int alloc_and_init(void **out, size_t size, int (*init_fn)(void *), void 
     }
 
     *out = p;
+    return 0;
+}
+
+// MARK: RTC Shims
+
+int sceRtcSetTick(SceDateTime *datePtr, const SceRtcTick *pTick) { //PSP2
+    return 0;
+}
+
+int sceRtcGetTick(SceDateTime *datePtr, SceRtcTick *pTick) { //PSP2
+    return 0;
+}
+
+int sceRtcGetDayOfWeek(int year, int month, int day) { //PSP2
+    return 0;
+}
+
+int sceRtcGetCurrentTick(SceRtcTick *tick) { //PSP2
     return 0;
 }
 
@@ -283,6 +303,14 @@ int sceKernelUsleep(unsigned microseconds) {
     return usleep(microseconds);
 }
 
+int sceKernelGetThreadId(void) { //PSP2
+    return 0;
+}
+
+int sceKernelGetThreadCurrentPriority(void) { //PSP2
+    return 0;
+}
+
 // MARK: Audio Shims
 
 static IggyAudioShimCallbacks g_audioCbs = {};
@@ -323,6 +351,18 @@ int sceAudioOutOutput(int handle, void* ptr) {
 
 // MARK: Misc
 
+int sceAppUtilSystemParamGetInt(SceSystemParamId paramId, int *value) { //PSP2
+    switch (paramId) {
+        default:
+            *value = 0;
+            return 0;
+    }
+}
+
 void gdraw_ps4_wait(void) {
+    usleep(1000);
+}
+
+void gdraw_psp2_wait(void) { //PSP2
     usleep(1000);
 }
